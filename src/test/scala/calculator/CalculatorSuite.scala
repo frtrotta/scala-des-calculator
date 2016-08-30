@@ -59,11 +59,13 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(delta() == 0, "delta must be 0")
     val s = Polynomial.computeSolutions(a, b, c, delta)
     assert(s().size == 1, "only one solution in case of delta == 0")
+    assert(s().contains(-1.0), "solution does not match expectation")
 
     a() = 4.0
     b() = 5.0
     assert(delta() === 9, "delta must be 9")
     assert(s().size === 2, "two distinct solutions expected")
+    assert(s().contains(-1.0) && s().contains(-0.25), "solutions do not match expectations")
   }
 
 }
