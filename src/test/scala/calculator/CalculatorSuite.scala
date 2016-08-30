@@ -68,4 +68,60 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(s().contains(-1.0) && s().contains(-0.25), "solutions do not match expectations")
   }
 
+  test("Cyclic dependencies check 1") {
+    val namedExpressions: Map[String, Signal[Expr]] = Map(
+      ("a", Signal(Literal(5))),
+      ("b", Signal(Literal(6.0))),
+      ("c", Signal(Plus(Ref("a"), Ref("b")))),
+      ("d", Signal(Ref("p")))
+    )
+
+    val values = Calculator.computeValues(namedExpressions)
+
+    assert(values("a")() === 5.0)
+    assert(values("b")() === 6.0)
+    assert(values("c")() === 11.0)
+    assert(values("d")().isNaN)
+  }
+
+  test("Cyclic dependencies check 2") {
+    val namedExpressions: Map[String, Signal[Expr]] = Map(
+      ("a", Signal(Ref("a")))
+    )
+
+    val values = Calculator.computeValues(namedExpressions)
+
+    assert(values("a")().isNaN)
+  }
+
+  test("Cyclic dependencies check 3") {
+    val namedExpressions: Map[String, Signal[Expr]] = Map(
+      ("a", Signal(Ref("b"))),
+      ("b", Signal(Ref("a")))
+    )
+
+    val values = Calculator.computeValues(namedExpressions)
+
+    assert(values("a")().isNaN)
+    assert(values("b")().isNaN)
+  }
+
+
+
+  test("Cyclic dependencies check 4") {
+    val namedExpressions: Map[String, Signal[Expr]] = Map(
+      ("a", Signal(Ref("b"))),
+      ("b", Signal(Ref("c"))),
+      ("c", Signal(Ref("a"))),
+      ("d", Signal(Literal(-1.0)))
+
+    )
+
+    val values = Calculator.computeValues(namedExpressions)
+
+    assert(values("a")().isNaN)
+    assert(values("b")().isNaN)
+    assert(values("c")().isNaN)
+    assert(values("d")() === -1.0)
+  }
 }
