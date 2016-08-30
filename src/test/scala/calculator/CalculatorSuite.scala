@@ -51,4 +51,19 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(resultRed2() == "red")
   }
 
+  test("Polynomial") {
+    val a = Var(1.0)
+    val b = Var(2.0)
+    val c = Var(1.0)
+    val delta = Polynomial.computeDelta(a, b, c)
+    assert(delta() == 0, "delta must be 0")
+    val s = Polynomial.computeSolutions(a, b, c, delta)
+    assert(s().size == 1, "only one solution in case of delta == 0")
+
+    a() = 4.0
+    b() = 5.0
+    assert(delta() === 9, "delta must be 9")
+    assert(s().size === 2, "two distinct solutions expected")
+  }
+
 }
